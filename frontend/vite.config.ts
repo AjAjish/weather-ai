@@ -7,9 +7,18 @@ export default defineConfig({
   server: {
     port: 5173,
     proxy: {
-      '/weather': 'http://localhost:8000',
-      '/explain_weather': 'http://localhost:8000',
-      '/ai': 'http://localhost:8000',
+      '/weather': {
+        target: 'http://localhost:8000',
+        changeOrigin: true,
+      },
+      '/explain_weather': {
+        target: 'http://localhost:8000',
+        changeOrigin: true,
+      },
+      '/ai': {
+        target: 'http://localhost:8000',
+        changeOrigin: true,
+      },
     },
   },
 })
