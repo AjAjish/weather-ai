@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { Thermometer, Droplets, Wind, Eye, Gauge, RefreshCw, Info, X } from 'lucide-react';
+import { Thermometer, Droplets, Wind, Gauge, RefreshCw, Info, X, ArrowDown, ArrowUp, CloudSun } from 'lucide-react';
 import type { WeatherData } from '../types';
 
 interface WeatherCardProps {
@@ -282,8 +282,14 @@ function AnimatedWeatherIcon({ condition }: { condition: string }) {
   );
 }
 
-function getProgressValue(value: number, type: 'humidity' | 'wind'): number {
-  if (type === 'humidity') return Math.min(value, 100);
+function getWindDirection(deg: number): string {
+  const directions = ['N', 'NE', 'E', 'SE', 'S', 'SW', 'W', 'NW'];
+  return directions[Math.round(deg / 45) % 8];
+}
+
+function getProgressValue(value: number, type: 'humidity' | 'wind' | 'pressure' | 'clouds'): number {
+  if (type === 'humidity' || type === 'clouds') return Math.min(value, 100);
+  if (type === 'pressure') return Math.min((value - 950) / 100 * 100, 100);
   return Math.min((value / 20) * 100, 100);
 }
 
@@ -327,9 +333,22 @@ export default function WeatherCard({ data }: WeatherCardProps) {
                 </span>
                 <span className="text-3xl sm:text-4xl text-white/80 drop-shadow-sm font-light">°C</span>
               </div>
-              <p className="text-sm sm:text-base text-white/70 mt-2 drop-shadow-sm">
-                Feels like {Math.round(data.feels_like)}°C
-              </p>
+              <div className="flex items-center gap-3 mt-2">
+                <p className="text-sm sm:text-base text-white/70 drop-shadow-sm">
+                  Feels like {Math.round(data.feels_like)}°C
+                </p>
+                <span className="text-white/30">|</span>
+                <div className="flex items-center gap-2 text-xs sm:text-sm text-white/70 drop-shadow-sm">
+                  <span className="flex items-center gap-1">
+                    <ArrowUp className="w-3 h-3 text-red-300" />
+                    {Math.round(data.max_temperature)}°
+                  </span>
+                  <span className="flex items-center gap-1">
+                    <ArrowDown className="w-3 h-3 text-blue-300" />
+                    {Math.round(data.min_temperature)}°
+                  </span>
+                </div>
+              </div>
             </div>
             <div className="hidden sm:flex items-center justify-center">
               <AnimatedWeatherIcon condition={data.weather} />
@@ -363,27 +382,45 @@ export default function WeatherCard({ data }: WeatherCardProps) {
             />
             <DetailItem
               icon={Wind}
-              label="Wind Speed"
-              value={data.wind_speed}
-              unit="m/s"
+              label="Wind"
+              value={`${data.wind_speed} m/s ${getWindDirection(data.wind_deg)}`}
               progress={getProgressValue(data.wind_speed, 'wind')}
               delay={50}
-              description="Wind speed measures how fast air is moving. Stronger winds can make temperatures feel colder (wind chill) and affect weather patterns. Measured in meters per second."
-            />
-            <DetailItem
-              icon={Eye}
-              label="Condition"
-              value={data.weather}
-              delay={100}
-              description="Weather condition describes the current state of the atmosphere. It tells you what to expect outside — clear skies, clouds, rain, snow, or storms."
+              description="Wind speed measures how fast air is moving. Wind direction tells you where the wind is coming from. Measured in meters per second."
             />
             <DetailItem
               icon={Gauge}
-              label="Feels Like"
-              value={Math.round(data.feels_like)}
-              unit="°C"
+              label="Pressure"
+              value={data.pressure}
+              unit="hPa"
+              progress={getProgressValue(data.pressure, 'pressure')}
+              delay={100}
+              description="Atmospheric pressure indicates the weight of the air above. Rising pressure usually means improving weather, while falling pressure can indicate approaching storms."
+            />
+            <DetailItem
+              icon={CloudSun}
+              label="Clouds"
+              value={data.clouds}
+              unit="%"
+              progress={getProgressValue(data.clouds, 'clouds')}
               delay={150}
-              description="Feels like temperature accounts for wind chill and humidity to reflect how the weather actually feels on your skin. It can differ significantly from the actual temperature."
+              description="Cloud cover percentage indicates how much of the sky is covered by clouds. Higher values mean more overcast conditions."
+            />
+            <DetailItem
+              icon={ArrowUp}
+              label="Max Temp"
+              value={Math.round(data.max_temperature)}
+              unit="°C"
+              delay={200}
+              description="The maximum temperature expected for today. This typically occurs in the afternoon when the sun is at its peak."
+            />
+            <DetailItem
+              icon={ArrowDown}
+              label="Min Temp"
+              value={Math.round(data.min_temperature)}
+              unit="°C"
+              delay={250}
+              description="The minimum temperature recorded for today. This typically occurs during the early morning hours before sunrise."
             />
           </div>
         </div>

@@ -4,8 +4,9 @@ import Navbar from './components/Navbar';
 import SearchBar from './components/SearchBar';
 import WeatherCard from './components/WeatherCard';
 import AIExplain from './components/AIExplain';
-import { fetchWeather, explainWeather } from './api';
-import type { WeatherData } from './types';
+import WeeklyForecastChart from './components/WeeklyForecastChart';
+import { fetchWeather, fetchWeeklyForecast, explainWeather } from './api';
+import type { WeatherData, ForecastData } from './types';
 
 function App() {
   const [dark, setDark] = useState(false);
@@ -17,15 +18,27 @@ function App() {
   const [aiLoading, setAiLoading] = useState(false);
   const [transitioning, setTransitioning] = useState(false);
 
+  const [forecast, setForecast] = useState<ForecastData | null>(null);
+  const [forecastLoading, setForecastLoading] = useState(false);
+  const [forecastError, setForecastError] = useState<string | null>(null);
+
   const handleSearch = useCallback(async (city: string) => {
     setTransitioning(true);
     setWeatherLoading(true);
     setWeatherError(null);
     setAiResponse(null);
+    setForecast(null);
+    setForecastError(null);
     setLastSearched(city);
     try {
       const data = await fetchWeather(city);
       setWeather(data);
+
+      setForecastLoading(true);
+      fetchWeeklyForecast(city)
+        .then(setForecast)
+        .catch((err) => setForecastError(err instanceof Error ? err.message : 'Failed to load forecast'))
+        .finally(() => setForecastLoading(false));
     } catch (err) {
       setWeatherError(err instanceof Error ? err.message : 'Something went wrong');
       setWeather(null);
@@ -144,6 +157,11 @@ function App() {
               <div className={transitioning ? 'opacity-50 scale-[0.98] transition-all duration-300' : 'opacity-100 scale-100 transition-all duration-300'}>
                 <div className="space-y-5 sm:space-y-6">
                   <WeatherCard data={weather} />
+                  <WeeklyForecastChart
+                    forecast={forecast}
+                    loading={forecastLoading}
+                    error={forecastError}
+                  />
                   <AIExplain
                     onExplain={handleExplain}
                     loading={aiLoading}
