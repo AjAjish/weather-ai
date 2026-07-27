@@ -1,5 +1,5 @@
 import { Sparkles, Loader2, Brain, ChevronDown, ChevronUp, WandSparkles } from 'lucide-react';
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import Markdown from 'react-markdown';
 
 interface AIExplainProps {
@@ -7,27 +7,6 @@ interface AIExplainProps {
   loading: boolean;
   response: string | null;
   hasWeather: boolean;
-}
-
-function TypewriterText({ text }: { text: string }) {
-  const [displayed, setDisplayed] = useState('');
-  const indexRef = useRef(0);
-
-  useEffect(() => {
-    indexRef.current = 0;
-    setDisplayed('');
-    const interval = setInterval(() => {
-      if (indexRef.current < text.length) {
-        setDisplayed(text.slice(0, indexRef.current + 1));
-        indexRef.current++;
-      } else {
-        clearInterval(interval);
-      }
-    }, 6);
-    return () => clearInterval(interval);
-  }, [text]);
-
-  return <Markdown>{displayed}</Markdown>;
 }
 
 export default function AIExplain({ onExplain, loading, response, hasWeather }: AIExplainProps) {
@@ -43,19 +22,19 @@ export default function AIExplain({ onExplain, loading, response, hasWeather }: 
   }, [loading, response]);
 
   return (
-    <div className="animate-fade-in-up-delay-2">
-      <div className="glass-card rounded-2xl overflow-hidden hover:shadow-lg transition-all duration-300">
-        <div className="p-5 sm:p-6 lg:p-8">
+    <div className="animate-fade-in-up">
+      <div className="md-card elevation-1 overflow-hidden">
+        <div className="p-4 sm:p-6">
           <div className="flex items-center justify-between mb-4 sm:mb-5">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-accent/10 to-accent/5 dark:from-accent/20 dark:to-accent/10 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
-                <Brain className="w-[18px] h-[18px] sm:w-5 sm:h-5 text-accent" />
+              <div className="w-10 h-10 rounded-xl bg-[var(--color-primary-container)] flex items-center justify-center">
+                <Brain className="w-5 h-5 text-[var(--color-on-primary-container)]" />
               </div>
               <div>
-                <h3 className="text-sm sm:text-base font-bold text-text dark:text-text-dark">
+                <h3 className="md-title-medium text-[var(--color-on-surface)]">
                   AI Weather Insight
                 </h3>
-                <p className="text-[10px] sm:text-xs font-medium text-subtext dark:text-subtext-dark">
+                <p className="md-label-small text-[var(--color-on-surface-variant)]">
                   Powered by OpenRouter
                 </p>
               </div>
@@ -64,28 +43,24 @@ export default function AIExplain({ onExplain, loading, response, hasWeather }: 
               {response && (
                 <button
                   onClick={() => setExpanded(!expanded)}
-                  className="w-8 h-8 rounded-xl hover:bg-muted dark:hover:bg-muted-dark flex items-center justify-center transition-all duration-200 cursor-pointer text-subtext dark:text-subtext-dark hover:scale-110 active:scale-95"
+                  className="md-icon-btn p-1"
                   aria-label={expanded ? 'Collapse' : 'Expand'}
                 >
-                  {expanded ? <ChevronUp className="w-[16px] h-[16px]" /> : <ChevronDown className="w-[16px] h-[16px]" />}
+                  {expanded ? <ChevronUp className="w-5 h-5" /> : <ChevronDown className="w-5 h-5" />}
                 </button>
               )}
               <button
                 onClick={onExplain}
                 disabled={loading || !hasWeather}
                 className={`
-                  px-4 py-2 sm:py-2.5 rounded-xl text-white text-xs sm:text-sm font-semibold
-                  transition-all duration-200 cursor-pointer flex items-center gap-1.5 sm:gap-2
-                  ${loading || !hasWeather
-                    ? 'bg-gray-300 dark:bg-white/10 cursor-not-allowed'
-                    : 'bg-accent hover:bg-accent/90 shadow-sm hover:shadow-md hover:scale-105 active:scale-95'
-                  }
+                  md-btn md-btn-primary md-btn-md gap-2
+                  ${loading || !hasWeather ? 'opacity-38 cursor-not-allowed' : ''}
                 `}
               >
                 {loading ? (
-                  <Loader2 className="w-3.5 h-3.5 sm:w-4 sm:h-4 animate-spin" />
+                  <Loader2 className="w-4 h-4 animate-spin" />
                 ) : (
-                  <WandSparkles className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+                  <WandSparkles className="w-4 h-4" />
                 )}
                 {loading ? 'Analyzing...' : 'Analyze'}
               </button>
@@ -94,41 +69,41 @@ export default function AIExplain({ onExplain, loading, response, hasWeather }: 
 
           {!hasWeather && !response && (
             <div className="flex flex-col items-center gap-3 py-8 sm:py-10 text-center">
-              <div className="w-14 h-14 rounded-2xl bg-muted dark:bg-muted-dark flex items-center justify-center">
-                <Sparkles className={`w-6 h-6 text-subtext/40 dark:text-subtext-dark/30 transition-all duration-700 ${showSparkle ? 'scale-110 opacity-60' : ''}`} />
+              <div className="w-14 h-14 rounded-2xl md-card elevation-0 bg-[var(--color-surface-container)] flex items-center justify-center">
+                <Sparkles className={`w-6 h-6 text-[var(--color-on-surface-variant)]/40 transition-all duration-700 ${showSparkle ? 'scale-110 opacity-60' : ''}`} />
               </div>
               <div>
-                <p className="text-sm font-medium text-text dark:text-text-dark/70">
+                <p className="md-title-small text-[var(--color-on-surface)]">
                   AI Insights
                 </p>
-                <p className="text-xs sm:text-sm text-subtext dark:text-subtext-dark mt-1 max-w-xs mx-auto">
-                  Search for a city and tap <span className="font-semibold text-accent">Analyze</span> to get AI-powered weather insights
+                <p className="md-body-small text-[var(--color-on-surface-variant)] mt-1 max-w-xs mx-auto">
+                  Search for a city and tap <span className="font-medium text-[var(--color-primary)]">Analyze</span> to get AI-powered weather insights
                 </p>
               </div>
             </div>
           )}
 
           {loading && (
-            <div className="flex items-center gap-3 sm:gap-4 py-4 sm:py-5 px-4 sm:px-5 rounded-xl bg-muted dark:bg-muted-dark border border-border dark:border-border-dark">
+            <div className="flex items-center gap-3 py-4 px-4 md-card elevation-0 bg-[var(--color-surface-container)] rounded-xl border border-[var(--color-outline-variant)]">
               <div className="flex gap-1.5">
-                <span className="w-2 h-2 sm:w-2.5 sm:h-2.5 rounded-full bg-accent" style={{ animation: 'pulse-dot 1.4s infinite ease-in-out both', animationDelay: '0s' }} />
-                <span className="w-2 h-2 sm:w-2.5 sm:h-2.5 rounded-full bg-accent-light" style={{ animation: 'pulse-dot 1.4s infinite ease-in-out both', animationDelay: '0.16s' }} />
-                <span className="w-2 h-2 sm:w-2.5 sm:h-2.5 rounded-full bg-accent" style={{ animation: 'pulse-dot 1.4s infinite ease-in-out both', animationDelay: '0.32s' }} />
+                <span className="w-2 h-2 rounded-full bg-[var(--color-primary)]" style={{ animation: 'pulse-dot 1.4s infinite ease-in-out both', animationDelay: '0s' }} />
+                <span className="w-2 h-2 rounded-full bg-[var(--color-primary)]" style={{ animation: 'pulse-dot 1.4s infinite ease-in-out both', animationDelay: '0.16s' }} />
+                <span className="w-2 h-2 rounded-full bg-[var(--color-primary)]" style={{ animation: 'pulse-dot 1.4s infinite ease-in-out both', animationDelay: '0.32s' }} />
               </div>
-              <span className="text-xs sm:text-sm font-medium text-subtext dark:text-subtext-dark">AI is analyzing the weather data...</span>
+              <span className="md-body-medium text-[var(--color-on-surface-variant)]">AI is analyzing the weather data...</span>
             </div>
           )}
 
           {response && expanded && (
-            <div className="p-4 sm:p-5 rounded-xl bg-muted dark:bg-muted-dark border border-border dark:border-border-dark animate-fade-in">
-              <div className="markdown-body text-xs sm:text-sm text-text dark:text-text-dark/85 leading-relaxed">
-                <TypewriterText text={response} />
+            <div className="md-card elevation-0 bg-[var(--color-surface-container)] rounded-xl p-4 animate-fade-in border border-[var(--color-outline-variant)]">
+              <div className="markdown-body md-body-medium text-[var(--color-on-surface)] leading-relaxed">
+                <Markdown>{response}</Markdown>
               </div>
             </div>
           )}
 
           {response && !expanded && (
-            <p className="text-xs sm:text-sm text-subtext dark:text-subtext-dark truncate cursor-pointer hover:text-text dark:hover:text-text-dark transition-colors duration-200" onClick={() => setExpanded(true)}>
+            <p className="md-body-small text-[var(--color-on-surface-variant)] truncate cursor-pointer hover:text-[var(--color-on-surface)] transition-colors duration-200" onClick={() => setExpanded(true)}>
               {response.slice(0, 120)}...
             </p>
           )}

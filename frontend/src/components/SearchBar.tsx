@@ -1,31 +1,37 @@
 import { useState, useRef, useEffect, type FormEvent } from 'react';
-import { Search, Loader2, MapPin, X, Clock, ArrowRight } from 'lucide-react';
+import { Search, Loader2, X, MapPin } from 'lucide-react';
 
 interface SearchBarProps {
   onSearch: (city: string) => void;
   loading: boolean;
 }
 
-const SUGGESTIONS = ['London', 'Tokyo', 'Paris', 'New York', 'Dubai'];
+const RECENT_STORAGE_KEY = 'weather_recent_searches';
+const MAX_RECENT = 5;
 
 export default function SearchBar({ onSearch, loading }: SearchBarProps) {
   const [query, setQuery] = useState('');
   const [focused, setFocused] = useState(false);
+  const [showSuggestions, setShowSuggestions] = useState(false);
   const [recentSearches, setRecentSearches] = useState<string[]>(() => {
     try {
-      return JSON.parse(localStorage.getItem('recentSearches') || '[]');
+      return JSON.parse(localStorage.getItem(RECENT_STORAGE_KEY) || '[]');
     } catch {
       return [];
     }
   });
-  const [showRecent, setShowRecent] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const handleClick = (e: MouseEvent) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node) && inputRef.current && !inputRef.current.contains(e.target as Node)) {
-        setShowRecent(false);
+      if (
+        dropdownRef.current &&
+        !dropdownRef.current.contains(e.target as Node) &&
+        inputRef.current &&
+        !inputRef.current.contains(e.target as Node)
+      ) {
+        setShowSuggestions(false);
       }
     };
     document.addEventListener('mousedown', handleClick);
@@ -33,9 +39,12 @@ export default function SearchBar({ onSearch, loading }: SearchBarProps) {
   }, []);
 
   const addRecentSearch = (city: string) => {
-    const updated = [city, ...recentSearches.filter(s => s.toLowerCase() !== city.toLowerCase())].slice(0, 5);
+    const updated = [
+      city,
+      ...recentSearches.filter((s) => s.toLowerCase() !== city.toLowerCase()),
+    ].slice(0, MAX_RECENT);
     setRecentSearches(updated);
-    localStorage.setItem('recentSearches', JSON.stringify(updated));
+    localStorage.setItem(RECENT_STORAGE_KEY, JSON.stringify(updated));
   };
 
   const handleSubmit = (e: FormEvent) => {
@@ -45,7 +54,7 @@ export default function SearchBar({ onSearch, loading }: SearchBarProps) {
       addRecentSearch(trimmed);
       onSearch(trimmed);
       inputRef.current?.blur();
-      setShowRecent(false);
+      setShowSuggestions(false);
     }
   };
 
@@ -54,65 +63,72 @@ export default function SearchBar({ onSearch, loading }: SearchBarProps) {
     addRecentSearch(city);
     onSearch(city);
     inputRef.current?.blur();
-    setShowRecent(false);
+    setShowSuggestions(false);
   };
 
   const clearRecent = () => {
     setRecentSearches([]);
-    localStorage.removeItem('recentSearches');
+    localStorage.removeItem(RECENT_STORAGE_KEY);
   };
 
-  const showDropdown = focused && !loading && (query.trim() === '' || showRecent);
+  const hasContent = query.trim() !== '';
+  const shouldShowDropdown = focused && !loading && (hasContent || showSuggestions);
 
   return (
-    <form onSubmit={handleSubmit} className="w-full" style={{ animation: 'fade-in-up 0.5s ease-out both' }}>
+    <form onSubmit={handleSubmit} className="w-full animate-fade-in-up">
       <div className="relative">
         <div
           className={`
-            relative flex items-center glass-card rounded-2xl overflow-hidden
-            transition-all duration-300
-            ${focused
-              ? 'ring-2 ring-accent/30 shadow-lg shadow-accent/5'
-              : 'hover:shadow-md'
-            }
+            md-textfield flex items-center gap-3
+            ${focused ? 'border-[var(--color-primary)] border-2' : ''}
+            ${hasContent ? 'bg-[var(--color-surface-container-high)]' : ''}
           `}
         >
-          <div className="flex items-center gap-2 pl-4 sm:pl-5 shrink-0">
-            <MapPin className={`w-4 h-4 sm:w-[18px] sm:h-[18px] transition-all duration-300 ${focused ? 'text-accent scale-110' : 'text-subtext dark:text-subtext-dark'}`} />
-          </div>
+          <MapPin
+            className={`
+              w-5 h-5 shrink-0 transition-colors duration-200
+              ${focused ? 'text-[var(--color-primary)]' : 'text-[var(--color-on-surface-variant)]'}
+            `}
+            aria-hidden="true"
+          />
           <input
             ref={inputRef}
             type="text"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            onFocus={() => { setFocused(true); setShowRecent(true); }}
-            onBlur={() => { setFocused(false); setTimeout(() => setShowRecent(false), 200); }}
+            onFocus={() => {
+              setFocused(true);
+              setShowSuggestions(true);
+            }}
+            onBlur={() => {
+              setFocused(false);
+              setTimeout(() => setShowSuggestions(false), 200);
+            }}
             placeholder="Search for a city..."
-            className="flex-1 bg-transparent text-text dark:text-text-dark placeholder-subtext/50 dark:placeholder-subtext-dark/40 px-3 py-3.5 sm:py-4 outline-none text-sm sm:text-base font-medium"
+            className="flex-1 bg-transparent text-[var(--color-on-surface)] placeholder-[var(--color-on-surface-variant)] outline-none text-base font-normal"
             disabled={loading}
+            aria-label="Search for a city"
           />
-          <div className="flex items-center pr-2 sm:pr-3 gap-1">
-            {query.trim() && !loading && (
+          <div className="flex items-center gap-1">
+            {hasContent && !loading && (
               <button
                 type="button"
                 onClick={() => setQuery('')}
-                className="w-7 h-7 rounded-lg hover:bg-muted dark:hover:bg-muted-dark flex items-center justify-center transition-all duration-200 cursor-pointer text-subtext dark:text-subtext-dark hover:scale-110"
+                className="md-icon-btn p-1"
                 tabIndex={-1}
+                aria-label="Clear search"
               >
-                <X className="w-[14px] h-[14px]" />
+                <X className="w-4 h-4" />
               </button>
             )}
             <button
               type="submit"
-              disabled={loading || !query.trim()}
+              disabled={loading || !hasContent}
               className={`
-                px-4 sm:px-5 py-2 sm:py-2.5 rounded-xl text-white text-sm font-semibold
-                transition-all duration-200 cursor-pointer flex items-center gap-2
-                ${loading || !query.trim()
-                  ? 'bg-gray-300 dark:bg-white/10 cursor-not-allowed'
-                  : 'bg-accent hover:bg-accent/90 shadow-sm hover:shadow-md hover:scale-105 active:scale-95'
-                }
+                md-btn md-btn-primary md-btn-md
+                ${loading || !hasContent ? 'opacity-38 cursor-not-allowed' : ''}
               `}
+              aria-label={loading ? 'Searching...' : 'Search'}
             >
               {loading ? (
                 <Loader2 className="w-4 h-4 animate-spin" />
@@ -124,22 +140,25 @@ export default function SearchBar({ onSearch, loading }: SearchBarProps) {
           </div>
         </div>
 
-        {showDropdown && (
+        {shouldShowDropdown && (
           <div
             ref={dropdownRef}
-            className="absolute top-full left-0 right-0 mt-2 glass-card rounded-2xl overflow-hidden shadow-lg z-40 animate-slide-down"
+            className="absolute top-full left-0 right-0 mt-2 md-card elevation-3 animate-slide-down z-50 max-h-[300px] overflow-auto"
+            role="listbox"
           >
-            {recentSearches.length > 0 && query.trim() === '' && (
-              <div>
-                <div className="flex items-center justify-between px-4 sm:px-5 pt-3 pb-1.5">
-                  <span className="text-[10px] sm:text-xs font-semibold text-subtext dark:text-subtext-dark uppercase tracking-wider flex items-center gap-1.5">
-                    <Clock className="w-3 h-3" />
-                    Recent
+            {recentSearches.length > 0 && !hasContent && (
+              <div className="border-b border-[var(--color-outline-variant)]">
+                <div className="flex items-center justify-between px-4 py-2">
+                  <span className="md-label-medium text-[var(--color-on-surface-variant)] flex items-center gap-2">
+                    <span className="w-4 h-4" aria-hidden="true">
+                      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67z"/></svg>
+                    </span>
+                    Recent searches
                   </span>
                   <button
                     type="button"
                     onClick={clearRecent}
-                    className="text-[10px] sm:text-xs font-medium text-subtext/60 dark:text-subtext-dark/50 hover:text-red-400 transition-colors duration-200 cursor-pointer"
+                    className="md-btn md-btn-text md-btn-sm text-[var(--color-error)] hover:text-[var(--color-error)]"
                   >
                     Clear
                   </button>
@@ -149,28 +168,35 @@ export default function SearchBar({ onSearch, loading }: SearchBarProps) {
                     key={city}
                     type="button"
                     onClick={() => handleSuggestion(city)}
-                    className="w-full flex items-center gap-3 px-4 sm:px-5 py-2.5 sm:py-3 text-left text-sm text-text dark:text-text-dark hover:bg-muted dark:hover:bg-muted-dark transition-all duration-200 cursor-pointer group"
-                    style={{ animation: `slide-down 0.2s ease-out ${i * 0.03}s both` }}
+                    className="md-list-item w-full justify-start gap-3"
+                    role="option"
+                    style={{ animation: `fade-in-up 0.2s ease-out ${i * 0.03}s both` }}
                   >
-                    <Clock className="w-3.5 h-3.5 text-subtext dark:text-subtext-dark shrink-0" />
-                    <span className="flex-1 font-medium">{city}</span>
-                    <ArrowRight className="w-3.5 h-3.5 text-subtext/40 dark:text-subtext-dark/30 opacity-0 group-hover:opacity-100 transition-opacity duration-200" />
+                    <span className="w-4 h-4 text-[var(--color-on-surface-variant)]" aria-hidden="true">
+                      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67z"/></svg>
+                    </span>
+                    <span className="md-body-medium flex-1">{city}</span>
+                    <span className="w-4 h-4 text-[var(--color-on-surface-variant)] opacity-0 group-hover:opacity-100 transition-opacity" aria-hidden="true">
+                      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.41z"/></svg>
+                    </span>
                   </button>
                 ))}
-                <div className="h-px bg-border dark:bg-border-dark mx-4 sm:mx-5" />
               </div>
             )}
-            <div className="px-4 sm:px-5 py-3">
-              <span className="text-[10px] sm:text-xs font-semibold text-subtext dark:text-subtext-dark uppercase tracking-wider">
-                Quick pick
-              </span>
-              <div className="flex flex-wrap gap-1.5 sm:gap-2 mt-2">
-                {SUGGESTIONS.map((city, i) => (
+
+            <div className="p-3">
+              <span className="md-label-medium text-[var(--color-on-surface-variant)]">Popular cities</span>
+              <div className="flex flex-wrap gap-2 mt-2">
+                {['New York', 'London', 'Tokyo', 'Paris', 'Dubai', 'Sydney'].map((city, i) => (
                   <button
                     key={city}
                     type="button"
                     onClick={() => handleSuggestion(city)}
-                    className="px-3 py-1.5 sm:px-4 sm:py-2 rounded-xl bg-muted dark:bg-muted-dark hover:bg-accent/10 dark:hover:bg-accent/10 hover:text-accent text-xs sm:text-sm font-semibold text-subtext dark:text-subtext-dark transition-all duration-200 cursor-pointer hover:scale-105 active:scale-95"
+                    className={`
+                      md-chip
+                      ${i === 0 ? 'md-chip-selected' : ''}
+                    `}
+                    role="option"
                     style={{ animation: `fade-in-up 0.3s ease-out ${i * 0.05}s both` }}
                   >
                     {city}

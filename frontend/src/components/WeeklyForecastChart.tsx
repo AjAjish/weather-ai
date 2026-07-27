@@ -179,18 +179,18 @@ export default function WeeklyForecastChart({ forecast, loading, error }: Weekly
 
   if (error) {
     return (
-      <div className="glass-card rounded-2xl p-6 text-center">
+      <div className="glass-card-3d rounded-2xl p-6 text-center">
         <p className="text-sm text-red-400">{error}</p>
       </div>
     );
   }
 
   return (
-    <div className="glass-card rounded-2xl overflow-hidden hover:shadow-lg transition-all duration-300">
+    <div className="glass-card-3d rounded-2xl overflow-hidden hover:shadow-lg transition-all duration-300">
       <div className="p-5 sm:p-6 lg:p-8">
         <div className="flex items-center justify-between mb-5">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-accent/10 to-accent/5 dark:from-accent/20 dark:to-accent/10 flex items-center justify-center">
+            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-accent/15 to-accent/5 dark:from-accent/25 dark:to-accent/10 flex items-center justify-center">
               <TrendingUp className="w-[18px] h-[18px] text-accent" />
             </div>
             <div>
@@ -224,7 +224,7 @@ export default function WeeklyForecastChart({ forecast, loading, error }: Weekly
               {forecast.map((day, i) => (
                 <div
                   key={day.date}
-                  className="flex flex-col items-center gap-1.5 sm:gap-2 p-2.5 sm:p-3 rounded-xl bg-muted dark:bg-muted-dark border border-border dark:border-border-dark hover:bg-accent/5 dark:hover:bg-accent/5 hover:border-accent/20 dark:hover:border-accent/20 transition-all duration-300 cursor-pointer group"
+                  className="flex flex-col items-center gap-1.5 sm:gap-2 p-2.5 sm:p-3 rounded-xl glass-card-3d hover:bg-muted/50 dark:hover:bg-muted-dark/50 hover:border-accent/20 dark:hover:border-accent/20 transition-all duration-300 cursor-pointer group"
                   style={{ animation: `fade-in-up 0.4s ease-out ${i * 0.07}s both` }}
                 >
                   <span className="text-[10px] sm:text-xs font-bold text-text dark:text-text-dark">
