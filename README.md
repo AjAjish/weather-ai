@@ -1,13 +1,17 @@
 <p align="center">
-  <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="https://img.shields.io/badge/●-Live-22C55E?style=flat-square">
-    <img src="https://img.shields.io/badge/●-Live-22C55E?style=flat-square" alt="Live" width="80">
-  </picture>
+  <img src="frontend/public/logo.png" alt="WeatherAI Logo" width="120" height="120" style="border-radius: 24px; box-shadow: 0 4px 20px rgba(34, 197, 94, 0.3);">
 </p>
 
 <h1 align="center" style="font-size: 3rem; font-weight: 800; line-height: 1.1; letter-spacing: -0.03em; margin: 0.5rem 0;">
   Weather<span style="color: #22C55E;">AI</span>
 </h1>
+
+<p align="center">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="https://img.shields.io/badge/●-Live-22C55E?style=flat-square">
+    <img src="https://img.shields.io/badge/●-Live-22C55E?style=flat-square" alt="Live" width="80">
+  </picture>
+</p>
 
 <p align="center" style="font-size: 1.1rem; color: #64748B; max-width: 520px; margin: 0 auto 1.5rem auto; line-height: 1.6;">
   Real-time weather conditions with <strong style="color: #22C55E;">AI-powered insights</strong>
