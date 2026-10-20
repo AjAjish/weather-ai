@@ -1,0 +1,17 @@
+{
+  "name": "Weather AI",
+  "short_name": "WeatherAI",
+  "description": "Real-time weather conditions with AI-powered insights",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#22C55E",
+  "icons": [
+    {
+      "src": "/logo.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
