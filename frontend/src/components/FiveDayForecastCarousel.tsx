@@ -3,7 +3,7 @@ import { Calendar, Droplets, Umbrella, ChevronLeft, ChevronRight } from 'lucide-
 import type { ForecastData } from '../types';
 import WeatherIcon from './WeatherIcon';
 
-interface WeeklyForecastCarouselProps {
+interface FiveDayForecastCarouselProps {
   forecast: ForecastData | null;
   loading: boolean;
   error: string | null;
@@ -25,7 +25,7 @@ function formatDayFull(dateStr: string): string {
   return d.toLocaleDateString('en', { weekday: 'long' });
 }
 
-export default function WeeklyForecastCarousel({ forecast, loading, error }: WeeklyForecastCarouselProps) {
+export default function FiveDayForecastCarousel({ forecast, loading, error }: FiveDayForecastCarouselProps) {
   const [scrollPosition, setScrollPosition] = useState(0);
   const carouselRef = useRef<HTMLDivElement>(null);
 

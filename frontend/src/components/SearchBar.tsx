@@ -105,11 +105,11 @@ export default function SearchBar({ onSearch, loading }: SearchBarProps) {
               setTimeout(() => setShowSuggestions(false), 200);
             }}
             placeholder="Search for a city..."
-            className="flex-1 bg-transparent text-[var(--color-on-surface)] placeholder-[var(--color-on-surface-variant)] outline-none text-base font-normal"
+            className="flex-1 min-w-0 bg-transparent text-[var(--color-on-surface)] placeholder-[var(--color-on-surface-variant)] outline-none text-base font-normal"
             disabled={loading}
             aria-label="Search for a city"
           />
-          <div className="flex items-center gap-1">
+          <div className="flex items-center gap-1 flex-shrink-0">
             {hasContent && !loading && (
               <button
                 type="button"
@@ -125,7 +125,7 @@ export default function SearchBar({ onSearch, loading }: SearchBarProps) {
               type="submit"
               disabled={loading || !hasContent}
               className={`
-                md-btn md-btn-primary md-btn-md
+                md-btn md-btn-primary md-btn-md flex-shrink-0
                 ${loading || !hasContent ? 'opacity-38 cursor-not-allowed' : ''}
               `}
               aria-label={loading ? 'Searching...' : 'Search'}

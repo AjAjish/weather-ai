@@ -3,7 +3,7 @@ import Navbar from './components/Navbar';
 import SearchBar from './components/SearchBar';
 import WeatherCard from './components/WeatherCard';
 import AIExplain from './components/AIExplain';
-import WeeklyForecastCarousel from './components/WeeklyForecastCarousel';
+import FiveDayForecastCarousel from './components/FiveDayForecastCarousel';
 import { fetchWeather, fetchWeeklyForecast, explainWeather } from './api';
 import type { WeatherData, ForecastData } from './types';
 
@@ -119,7 +119,7 @@ function App() {
             {weather && !weatherLoading && (
               <div className="space-y-5 sm:space-y-6 animate-fade-in-up">
                 <WeatherCard data={weather} />
-                <WeeklyForecastCarousel
+                <FiveDayForecastCarousel
                   forecast={forecast}
                   loading={forecastLoading}
                   error={forecastError}
