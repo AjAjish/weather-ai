@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { CloudSun, Sun, Moon } from 'lucide-react';
+import { Sun, Moon } from 'lucide-react';
 
 interface NavbarProps {
   dark: boolean;
@@ -29,8 +29,12 @@ export default function Navbar({ dark, onToggleDark }: NavbarProps) {
       <div className="max-w-5xl mx-auto px-4">
         <div className="h-16 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="w-9 h-9 rounded-xl bg-[var(--color-primary)] flex items-center justify-center shadow-sm">
-              <CloudSun className="w-5 h-5 text-[var(--color-on-primary)]" />
+            <div className="w-9 h-9 rounded-xl overflow-hidden shadow-sm">
+              <img
+                src="/logo.png"
+                alt="WeatherAI logo"
+                className="w-full h-full object-cover"
+              />
             </div>
             <span className="md-title-large text-[var(--color-on-surface)] font-medium">
               WeatherAI
@@ -42,7 +46,7 @@ export default function Navbar({ dark, onToggleDark }: NavbarProps) {
               className={`
                 md-icon-btn
                 ${toggling ? 'scale-90' : ''}
-                group
+                group relative overflow-hidden
               `}
               aria-label={dark ? 'Switch to light mode' : 'Switch to dark mode'}
               data-tooltip={dark ? 'Light mode' : 'Dark mode'}
