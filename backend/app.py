@@ -36,3 +36,6 @@ else:
     async def root():
         return {"message": "Application is running successfully."}
 
+    @app.get('/health')
+    async def health():
+        return {"status": "Application is healthy and running successfully."}
