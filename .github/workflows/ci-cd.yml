@@ -32,7 +32,7 @@ jobs:
           cache-dependency-path: frontend/package-lock.json
 
       - name: Install frontend dependencies
-        run: npm ci
+        run: npm install
 
       - name: Lint frontend
         run: npm run lint
@@ -66,4 +66,4 @@ jobs:
           python -m pip install pytest
 
       - name: Run backend tests
-        run: python -m pytest -v
+        run: python -m pytest -v tests/test.py
